@@ -1,5 +1,6 @@
 {
   "name": "mcp-cost-tracker-router",
+  "mcpName": "io.github.dbsectrainer/mcp-cost-tracker-router",
   "version": "1.0.0",
   "description": "Real-time cost awareness for MCP agent workflows",
   "author": "dbsectrainer",
