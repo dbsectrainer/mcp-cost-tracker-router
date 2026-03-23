@@ -1,0 +1,33 @@
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      dbPath:
+        type: string
+        description: "Path to SQLite database file"
+      budgetAlert:
+        type: number
+        description: "Budget alert threshold in dollars"
+      defaultModel:
+        type: string
+        description: "Default model to use for routing"
+      enforceBudget:
+        type: boolean
+        description: "Enforce budget limits and reject requests over budget"
+      pricingTable:
+        type: string
+        description: "Path to custom pricing table JSON file"
+    required: []
+  commandFunction: |
+    (config) => ({
+      command: "node",
+      args: [
+        "dist/index.js",
+        ...(config.dbPath ? ["--db", config.dbPath] : []),
+        ...(config.budgetAlert ? ["--budget-alert", String(config.budgetAlert)] : []),
+        ...(config.defaultModel ? ["--default-model", config.defaultModel] : []),
+        ...(config.enforceBudget ? ["--enforce-budget"] : []),
+        ...(config.pricingTable ? ["--pricing-table", config.pricingTable] : [])
+      ]
+    })
