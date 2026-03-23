@@ -1,24 +1,24 @@
 import { getToolCosts, getSessionTotals, getSpendHistory } from "../db.js";
 function escapeHtml(str) {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
 }
 function formatUsd(amount) {
-  return `$${amount.toFixed(6)}`;
+    return `$${amount.toFixed(6)}`;
 }
 function formatNumber(n) {
-  return n.toLocaleString("en-US");
+    return n.toLocaleString("en-US");
 }
 function buildBarChart(items) {
-  if (items.length === 0) {
-    return "<p style='color:#666;font-style:italic;'>No data available.</p>";
-  }
-  const rows = items.map(({ label, value, maxValue }) => {
-    const pct = maxValue > 0 ? Math.round((value / maxValue) * 100) : 0;
-    return `
+    if (items.length === 0) {
+        return "<p style='color:#666;font-style:italic;'>No data available.</p>";
+    }
+    const rows = items.map(({ label, value, maxValue }) => {
+        const pct = maxValue > 0 ? Math.round((value / maxValue) * 100) : 0;
+        return `
       <div style="margin-bottom:8px;">
         <div style="display:flex;align-items:center;gap:8px;">
           <span style="min-width:160px;font-size:13px;color:#333;">${escapeHtml(label)}</span>
@@ -28,43 +28,38 @@ function buildBarChart(items) {
           <span style="min-width:90px;text-align:right;font-size:13px;color:#333;">${formatUsd(value)}</span>
         </div>
       </div>`;
-  });
-  return rows.join("");
+    });
+    return rows.join("");
 }
 export function handleExportSpendReport(db, state) {
-  const totals = getSessionTotals(db, state.sessionId);
-  const toolCosts = getToolCosts(db, state.sessionId);
-  const dayHistory = getSpendHistory(db, "day");
-  const weekHistory = getSpendHistory(db, "week");
-  const monthHistory = getSpendHistory(db, "month");
-  // Build model comparison from monthly data
-  const allModels = monthHistory.by_model;
-  const maxModelCost = allModels.reduce((m, r) => Math.max(m, r.cost_usd), 0);
-  const modelBarItems = allModels.map((r) => ({
-    label: r.model,
-    value: r.cost_usd,
-    maxValue: maxModelCost,
-  }));
-  // Build tool breakdown bar chart for current session
-  const maxToolCost = toolCosts.reduce((m, r) => Math.max(m, r.cost_usd), 0);
-  const toolBarItems = toolCosts.map((r) => ({
-    label: r.tool_name,
-    value: r.cost_usd,
-    maxValue: maxToolCost,
-  }));
-  const budgetStatus =
-    state.budgetThresholdUsd !== null
-      ? (() => {
-          const pct =
-            state.budgetThresholdUsd > 0
-              ? Math.round(
-                  (totals.total_cost_usd / state.budgetThresholdUsd) * 100,
-                )
-              : 0;
-          const remaining = state.budgetThresholdUsd - totals.total_cost_usd;
-          const color =
-            pct >= 100 ? "#c0392b" : pct >= 80 ? "#e67e22" : "#27ae60";
-          return `
+    const totals = getSessionTotals(db, state.sessionId);
+    const toolCosts = getToolCosts(db, state.sessionId);
+    const dayHistory = getSpendHistory(db, "day");
+    const weekHistory = getSpendHistory(db, "week");
+    const monthHistory = getSpendHistory(db, "month");
+    // Build model comparison from monthly data
+    const allModels = monthHistory.by_model;
+    const maxModelCost = allModels.reduce((m, r) => Math.max(m, r.cost_usd), 0);
+    const modelBarItems = allModels.map((r) => ({
+        label: r.model,
+        value: r.cost_usd,
+        maxValue: maxModelCost,
+    }));
+    // Build tool breakdown bar chart for current session
+    const maxToolCost = toolCosts.reduce((m, r) => Math.max(m, r.cost_usd), 0);
+    const toolBarItems = toolCosts.map((r) => ({
+        label: r.tool_name,
+        value: r.cost_usd,
+        maxValue: maxToolCost,
+    }));
+    const budgetStatus = state.budgetThresholdUsd !== null
+        ? (() => {
+            const pct = state.budgetThresholdUsd > 0
+                ? Math.round((totals.total_cost_usd / state.budgetThresholdUsd) * 100)
+                : 0;
+            const remaining = state.budgetThresholdUsd - totals.total_cost_usd;
+            const color = pct >= 100 ? "#c0392b" : pct >= 80 ? "#e67e22" : "#27ae60";
+            return `
             <section style="margin-bottom:32px;">
               <h2 style="color:#333;border-bottom:2px solid #4a90d9;padding-bottom:8px;">Budget Status</h2>
               <p>Threshold: <strong>${formatUsd(state.budgetThresholdUsd)}</strong></p>
@@ -75,39 +70,34 @@ export function handleExportSpendReport(db, state) {
               </div>
             </section>`;
         })()
-      : "";
-  const toolTableRows =
-    toolCosts.length > 0
-      ? toolCosts
-          .map(
-            (t) => `
+        : "";
+    const toolTableRows = toolCosts.length > 0
+        ? toolCosts
+            .map((t) => `
           <tr style="border-bottom:1px solid #eee;">
             <td style="padding:8px 12px;">${escapeHtml(t.tool_name)}</td>
             <td style="padding:8px 12px;text-align:right;">${formatNumber(t.input_tokens)}</td>
             <td style="padding:8px 12px;text-align:right;">${formatNumber(t.output_tokens)}</td>
             <td style="padding:8px 12px;text-align:right;">${t.call_count}</td>
             <td style="padding:8px 12px;text-align:right;font-weight:bold;">${formatUsd(t.cost_usd)}</td>
-          </tr>`,
-          )
-          .join("")
-      : `<tr><td colspan="5" style="padding:16px;text-align:center;color:#666;font-style:italic;">No tool usage recorded in this session.</td></tr>`;
-  const historyRows = [
-    { label: "Last 24 hours", data: dayHistory },
-    { label: "Last 7 days", data: weekHistory },
-    { label: "Last 30 days", data: monthHistory },
-  ]
-    .map(
-      ({ label, data }) => `
+          </tr>`)
+            .join("")
+        : `<tr><td colspan="5" style="padding:16px;text-align:center;color:#666;font-style:italic;">No tool usage recorded in this session.</td></tr>`;
+    const historyRows = [
+        { label: "Last 24 hours", data: dayHistory },
+        { label: "Last 7 days", data: weekHistory },
+        { label: "Last 30 days", data: monthHistory },
+    ]
+        .map(({ label, data }) => `
         <tr style="border-bottom:1px solid #eee;">
           <td style="padding:8px 12px;">${label}</td>
           <td style="padding:8px 12px;text-align:right;">${formatNumber(data.total_input_tokens)}</td>
           <td style="padding:8px 12px;text-align:right;">${formatNumber(data.total_output_tokens)}</td>
           <td style="padding:8px 12px;text-align:right;font-weight:bold;">${formatUsd(data.total_cost_usd)}</td>
-        </tr>`,
-    )
-    .join("");
-  const reportDate = new Date().toISOString();
-  const html = `<!DOCTYPE html>
+        </tr>`)
+        .join("");
+    const reportDate = new Date().toISOString();
+    const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -261,5 +251,5 @@ export function handleExportSpendReport(db, state) {
   </div>
 </body>
 </html>`;
-  return html;
+    return html;
 }

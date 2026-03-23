@@ -1,17 +1,29 @@
 /**
- * Token count estimation utilities.
- * Uses a simple character-based approximation: chars / 4 ≈ tokens.
- * All counts are labeled as estimates.
+ * Token counting utilities using js-tiktoken (cl100k_base encoding).
+ * Falls back to the char/4 approximation if the tiktoken encoding is unavailable.
  */
+import { getEncoding } from "js-tiktoken";
+function countWithTiktoken(text) {
+    try {
+        const enc = getEncoding("cl100k_base");
+        return enc.encode(text).length;
+    }
+    catch {
+        // Fallback: char/4 approximation for unknown encodings
+        return Math.ceil(text.length / 4);
+    }
+}
 export function estimateTokens(text) {
-  // Simple approximation: 4 characters ≈ 1 token
-  return Math.ceil(text.length / 4);
+    if (!text)
+        return 0;
+    return countWithTiktoken(text);
 }
 export function estimateTokensFromObject(obj) {
-  try {
-    const json = JSON.stringify(obj);
-    return estimateTokens(json);
-  } catch {
-    return 0;
-  }
+    try {
+        const json = JSON.stringify(obj);
+        return estimateTokens(json);
+    }
+    catch {
+        return 0;
+    }
 }
