@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
-    "better-sqlite3": "^12.6.2",
+    "better-sqlite3": "^12.8.0",
     "express": "^5.2.1",
     "js-tiktoken": "^1.0.21",
     "js-yaml": "^4.1.1"
