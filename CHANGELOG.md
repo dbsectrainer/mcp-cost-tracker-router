@@ -5,6 +5,16 @@ All notable changes to MCP Cost Tracker & Router will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.0 (2026-03-23)
+
+
+### Features
+
+* add mcpName for official MCP registry publication ([812977a](https://github.com/dbsectrainer/mcp-cost-tracker-router/commit/812977a6ca18a5aeed282f5a8aa04fa503b0578d))
+* add server.json for official MCP registry ([9c3128f](https://github.com/dbsectrainer/mcp-cost-tracker-router/commit/9c3128f24bf1edd60ec8b2606b0adcb6f22a8d63))
+* add smithery.yaml for Smithery deployment ([8978b45](https://github.com/dbsectrainer/mcp-cost-tracker-router/commit/8978b45f5c6165904a39e6cf57bc85c6dce2fa64))
+* initial release v1.0.0 ([fefa948](https://github.com/dbsectrainer/mcp-cost-tracker-router/commit/fefa948058a4bde8afcbf87319597c43a81ba925))
+
 ## [Unreleased]
 
 ## [1.0.0] - 2026-03-23
