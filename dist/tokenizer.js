@@ -4,26 +4,23 @@
  */
 import { getEncoding } from "js-tiktoken";
 function countWithTiktoken(text) {
-    try {
-        const enc = getEncoding("cl100k_base");
-        return enc.encode(text).length;
-    }
-    catch {
-        // Fallback: char/4 approximation for unknown encodings
-        return Math.ceil(text.length / 4);
-    }
+  try {
+    const enc = getEncoding("cl100k_base");
+    return enc.encode(text).length;
+  } catch {
+    // Fallback: char/4 approximation for unknown encodings
+    return Math.ceil(text.length / 4);
+  }
 }
 export function estimateTokens(text) {
-    if (!text)
-        return 0;
-    return countWithTiktoken(text);
+  if (!text) return 0;
+  return countWithTiktoken(text);
 }
 export function estimateTokensFromObject(obj) {
-    try {
-        const json = JSON.stringify(obj);
-        return estimateTokens(json);
-    }
-    catch {
-        return 0;
-    }
+  try {
+    const json = JSON.stringify(obj);
+    return estimateTokens(json);
+  } catch {
+    return 0;
+  }
 }
