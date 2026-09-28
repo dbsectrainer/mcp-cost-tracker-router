@@ -45,7 +45,7 @@
     "better-sqlite3": "^12.11.1",
     "express": "^5.2.1",
     "js-tiktoken": "^1.0.21",
-    "js-yaml": "^4.3.2"
+    "js-yaml": "^5.4.2"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.0.0",
