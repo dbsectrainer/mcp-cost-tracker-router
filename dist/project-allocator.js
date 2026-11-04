@@ -1,5 +1,5 @@
 export function initProjectTables(db) {
-  db.exec(`
+    db.exec(`
     CREATE TABLE IF NOT EXISTS projects (
       id INTEGER PRIMARY KEY,
       name TEXT UNIQUE NOT NULL,
@@ -15,36 +15,29 @@ export function initProjectTables(db) {
   `);
 }
 export function tagSession(db, sessionId, projectName) {
-  // Ensure project exists
-  const now = new Date().toISOString();
-  db.prepare(
-    `
+    // Ensure project exists
+    const now = new Date().toISOString();
+    db.prepare(`
     INSERT OR IGNORE INTO projects (name, budget_usd, created_at)
     VALUES (?, NULL, ?)
-  `,
-  ).run(projectName, now);
-  db.prepare(
-    `
+  `).run(projectName, now);
+    db.prepare(`
     INSERT OR REPLACE INTO session_projects (session_id, project_name)
     VALUES (?, ?)
-  `,
-  ).run(sessionId, projectName);
+  `).run(sessionId, projectName);
 }
 export function setProjectBudget(db, projectName, budgetUsd) {
-  const now = new Date().toISOString();
-  db.prepare(
-    `
+    const now = new Date().toISOString();
+    db.prepare(`
     INSERT INTO projects (name, budget_usd, created_at)
     VALUES (?, ?, ?)
     ON CONFLICT(name) DO UPDATE SET budget_usd = excluded.budget_usd
-  `,
-  ).run(projectName, budgetUsd, now);
+  `).run(projectName, budgetUsd, now);
 }
 export function getProjectCosts(db, projectName, since) {
-  const sinceTs = since ? new Date(since).getTime() : 0;
-  const totalRow = db
-    .prepare(
-      `
+    const sinceTs = since ? new Date(since).getTime() : 0;
+    const totalRow = db
+        .prepare(`
     SELECT
       COALESCE(SUM(tu.cost_usd), 0) AS total_cost_usd,
       COUNT(DISTINCT tu.session_id) AS session_count
@@ -52,12 +45,10 @@ export function getProjectCosts(db, projectName, since) {
     INNER JOIN session_projects sp ON sp.session_id = tu.session_id
     WHERE sp.project_name = ?
       AND tu.recorded_at >= ?
-  `,
-    )
-    .get(projectName, sinceTs);
-  const topTools = db
-    .prepare(
-      `
+  `)
+        .get(projectName, sinceTs);
+    const topTools = db
+        .prepare(`
     SELECT
       tu.tool_name AS tool,
       SUM(tu.cost_usd) AS cost
@@ -68,13 +59,12 @@ export function getProjectCosts(db, projectName, since) {
     GROUP BY tu.tool_name
     ORDER BY cost DESC
     LIMIT 10
-  `,
-    )
-    .all(projectName, sinceTs);
-  return {
-    project: projectName,
-    total_cost_usd: totalRow.total_cost_usd,
-    session_count: totalRow.session_count,
-    top_tools: topTools,
-  };
+  `)
+        .all(projectName, sinceTs);
+    return {
+        project: projectName,
+        total_cost_usd: totalRow.total_cost_usd,
+        session_count: totalRow.session_count,
+        top_tools: topTools,
+    };
 }

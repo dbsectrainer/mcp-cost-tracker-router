@@ -6,12 +6,12 @@
     "url": "https://github.com/dbsectrainer/mcp-cost-tracker-router",
     "source": "github"
   },
-  "version": "1.0.0",
+  "version": "1.0.1",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "mcp-cost-tracker-router",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "transport": {
         "type": "stdio"
       },
