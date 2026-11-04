@@ -1,10 +1,10 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 export interface ServerConfig {
-  dbPath: string;
-  defaultModel: string;
-  budgetAlert?: number;
-  enforceBudget: boolean;
-  pricingTablePath?: string;
+    dbPath: string;
+    defaultModel: string;
+    budgetAlert?: number;
+    enforceBudget: boolean;
+    pricingTablePath?: string;
 }
 export declare function isCancelled(requestId: string): boolean;
 /**
